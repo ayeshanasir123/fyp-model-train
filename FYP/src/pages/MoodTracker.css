@@ -1,0 +1,130 @@
+.mood-container {
+    padding: 10px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.risk-indicator-chip {
+    background: rgba(111, 207, 151, 0.1);
+    color: #6FCF97;
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+}
+
+.chart-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.chart-legend {
+    font-size: 0.8rem;
+    color: #8e8e93;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chart-legend .dot {
+    width: 8px;
+    height: 8px;
+    background: #007AFF;
+    border-radius: 50%;
+}
+
+.mood-grid-layout {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 20px;
+}
+
+.log-mood-card, .insights-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 25px;
+}
+
+.mood-selector {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.mood-btn {
+    background: transparent;
+    border: none;
+    color: #636366;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.mood-btn.active {
+    color: var(--active-color);
+    transform: scale(1.1);
+}
+
+.mood-btn svg {
+    width: 32px;
+    height: 32px;
+}
+
+.mood-note {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px;
+    color: white;
+    resize: none;
+    height: 80px;
+    margin-bottom: 15px;
+}
+
+.submit-mood-btn {
+    width: 100%;
+    background: #007AFF;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.insight-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 15px;
+    border-radius: 14px;
+    margin-top: 15px;
+}
+
+.insight-item p { margin: 0; font-size: 0.9rem; color: #a1a1a6; }

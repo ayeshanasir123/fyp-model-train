@@ -1,0 +1,197 @@
+:root {
+  /* High-Contrast Charcoal Palette */
+  --bg-color: #000000;
+  --card-bg: rgba(24, 24, 26, 0.85); /* Solid Charcoal Glass */
+  --text-primary: #FFFFFF;           /* Pure White for headings */
+  --text-secondary: #B0B0B0;         /* Soft Grey for subtext */
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --border-light: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] {
+  --card-bg: rgba(15, 15, 17, 0.9);
+  --text-secondary: #999999;
+}
+
+.auth-wrapper {
+  background-color: transparent; 
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-container {
+  background-color: var(--card-bg);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+  position: relative;
+  overflow: hidden;
+  
+  /* SMALLER DIMENSIONS */
+  width: 800px; 
+  max-width: 90%;
+  height: 480px; /* Reduced height for a compact look */
+  
+  display: flex;
+  z-index: 5; 
+}
+
+/* Form Sections */
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 40px; /* Tightened padding */
+  text-align: center;
+}
+
+h1 {
+  color: var(--text-primary);
+  font-size: 1.6rem;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+p {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.auth-form { width: 100%; }
+
+.input-field {
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-light);
+  padding: 12px 16px;
+  margin: 6px 0;
+  width: 100%;
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.input-field:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Role Selector */
+.role-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.role-selector button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.role-selector button.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: #fff;
+}
+
+.main-btn {
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  padding: 14px;
+  width: 100%;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.2s ease;
+}
+
+.main-btn:hover {
+  background: #f0f0f0;
+  transform: translateY(-1px);
+}
+
+/* Overlay Styling */
+.overlay-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  z-index: 10;
+}
+
+.overlay {
+  background: linear-gradient(145deg, #1a1a1c, #2c2c2e);
+  color: #FFFFFF;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px; 
+}
+.role-selector button.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-color: #ffffff; /* Bright white border when selected */
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+.overlay h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+
+.ghost-btn {
+  background: transparent;
+  border: 1.5px solid #FFFFFF;
+  color: #FFFFFF;
+  padding: 10px 35px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.ghost-btn:hover {
+  background: #FFFFFF;
+  color: #000000;
+}
+
+.theme-toggle {
+  position: fixed; 
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  z-index: 1000;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  padding: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--border-light);
+  color: white;
+}

@@ -1,0 +1,79 @@
+/* src/pages/Journal.css */
+.journal-page {
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    background-color: var(--bg-color);
+    min-height: 80vh;
+}
+
+.journal-card {
+    background: var(--card-bg, #ffffff);
+    width: 100%;
+    max-width: 800px;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.journal-card header h1 {
+    font-size: 2rem;
+    margin: 0.5rem 0;
+    color: var(--text-main);
+}
+
+.journal-input {
+    width: 100%;
+    min-height: 300px;
+    padding: 1.5rem;
+    border-radius: 15px;
+    border: 1px solid #e0e0e0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    resize: none;
+    font-family: inherit;
+    background-color: #f9f9fb;
+    transition: border 0.3s;
+}
+
+.journal-input:focus {
+    outline: none;
+    border-color: #007AFF;
+    background-color: #fff;
+}
+
+.journal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #8e8e93;
+    font-size: 0.9rem;
+}
+
+.save-btn {
+    background: #007AFF;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.save-btn:hover {
+    transform: translateY(-2px);
+    background: #0066d6;
+}
