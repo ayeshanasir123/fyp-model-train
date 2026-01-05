@@ -11,7 +11,7 @@ from emotion_data.models import emotion_data
 
 # --- Configure Gemini ---
 # Keep transport='rest' to help with the connection issues we saw earlier
-genai.configure(api_key="AIzaSyBF4TbLwpbR0jajrRZQgyDHNDS2ldR6rFM", transport='rest')
+genai.configure(api_key="AIzaSyBp1bNtBS5bUg8mc45m6bU_J3e0REtfzhA", transport='rest')
 
 THERAPIST_PROMPT = (
     "You are an empathetic, professional AI Mental Health Guide. "

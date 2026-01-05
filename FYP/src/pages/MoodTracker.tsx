@@ -92,21 +92,27 @@ const MoodTracker: React.FC = () => {
                         <AreaChart data={history.length > 0 ? history : []}>
                             <defs>
                                 <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#007AFF" stopOpacity={0.3}/>
-                                    <stop offset="95%" stopColor="#007AFF" stopOpacity={0}/>
+                                    <stop offset="5%" stopColor="#A8D8EA" stopOpacity={0.3}/>
+                                    <stop offset="95%" stopColor="#AA96DA" stopOpacity={0}/>
                                 </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                            <XAxis dataKey="date" stroke="#636366" axisLine={false} tickLine={false} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(168, 216, 234, 0.2)" vertical={false} />
+                            <XAxis dataKey="date" stroke="#7F8C8D" axisLine={false} tickLine={false} />
                             <YAxis domain={[0, 5]} hide />
                             <Tooltip 
-                                contentStyle={{ backgroundColor: '#1c1c1e', border: '1px solid #3a3a3c', borderRadius: '10px' }}
-                                itemStyle={{ color: '#fff' }}
+                                contentStyle={{ 
+                                    backgroundColor: 'rgba(255, 255, 255, 0.98)', 
+                                    border: '2px solid rgba(168, 216, 234, 0.3)', 
+                                    borderRadius: '12px',
+                                    boxShadow: '0 4px 12px rgba(168, 216, 234, 0.2)'
+                                }}
+                                itemStyle={{ color: '#2C3E50', fontWeight: '600' }}
+                                labelStyle={{ color: '#7F8C8D', fontWeight: '600' }}
                             />
                             <Area 
                                 type="monotone" 
                                 dataKey="score" 
-                                stroke="#007AFF" 
+                                stroke="#A8D8EA" 
                                 fillOpacity={1} 
                                 fill="url(#colorScore)" 
                                 strokeWidth={3}
@@ -145,7 +151,7 @@ const MoodTracker: React.FC = () => {
                 <section className="insights-card">
                     <h3>AI Insights</h3>
                     <div className="insight-item">
-                        <Calendar size={18} color="#007AFF" />
+                        <Calendar size={18} color="#A8D8EA" />
                         <p>Total logs found: <strong>{history.length}</strong></p>
                     </div>
                 </section>

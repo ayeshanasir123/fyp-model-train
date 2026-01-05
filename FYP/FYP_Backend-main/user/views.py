@@ -28,6 +28,57 @@ def user_list_create(request):
         # If data is invalid (e.g. missing email), return the specific errors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def user_login(request):
+    """
+    Login user with email and password validation.
+    Returns user data along with their client_id if they have a client profile.
+    """
+    email = request.data.get('email')
+    password = request.data.get('password')
+    
+    if not email or not password:
+        return Response(
+            {"error": "Email and password are required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        user = UserModel.objects.get(email=email)
+        
+        # Check password
+        if user.password == password:  # In production, use hashed passwords
+            serializer = UserSerializer(user)
+            user_data = serializer.data
+            
+            # Check if this user has a client profile
+            from client.models import client
+            try:
+                # Look for client by user_id, not client_id
+                client_profile = client.objects.get(user_id=user.user_id)
+                user_data['id'] = client_profile.client_id  # Add client_id as 'id' for frontend
+                user_data['client_id'] = client_profile.client_id
+                user_data['client_name'] = client_profile.name
+                print(f"[Login] User {user.user_id} ({user.email}) logged in with client_id: {client_profile.client_id}")
+            except client.DoesNotExist:
+                print(f"[Login] User {user.user_id} ({user.email}) has no client profile")
+                # For coaches or admin users without client profiles
+                user_data['id'] = user.user_id
+                user_data['client_id'] = None
+            
+            return Response(user_data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"error": "Invalid password"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+    except UserModel.DoesNotExist:
+        return Response(
+            {"error": "User not found. Please sign up first."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([AllowAny]) # Also set to AllowAny for testing; change to IsAuthenticated later
 def user_detail(request, pk):

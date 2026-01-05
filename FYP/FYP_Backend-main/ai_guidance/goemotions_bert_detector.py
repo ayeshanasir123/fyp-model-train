@@ -10,8 +10,9 @@ import json
 import numpy as np
 from typing import Dict, List, Tuple
 
-# Add goemotions to path
-GOEMOTIONS_PATH = r"c:\Users\99TECH\Desktop\model training\goemotions"
+# Add goemotions to path - use relative path from current file
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+GOEMOTIONS_PATH = os.path.join(BASE_DIR, "motioncode")
 sys.path.insert(0, GOEMOTIONS_PATH)
 
 class GoEmotionsBERTDetector:

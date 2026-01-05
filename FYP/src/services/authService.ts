@@ -2,30 +2,20 @@ import axios from 'axios';
 
 const API_URL = 'http://127.0.0.1:8000/api/user/';
 
-// 1. SIGNUP: Stays mostly the same, but we save the user immediately on success
-export const signupUser = async (name: string, email: string, role: string) => {
-    const response = await axios.post(API_URL, { name, email, role });
-    if (response.data) {
-        localStorage.setItem('user', JSON.stringify(response.data));
-    }
+// 1. SIGNUP: Create new user with password
+export const signupUser = async (name: string, email: string, password: string, role: string) => {
+    const response = await axios.post(API_URL, { name, email, password, role });
     return response.data;
 };
 
-// 2. LOGIN: Improved to be more efficient
-export const loginUser = async (email: string) => {
-    // Instead of fetching EVERYONE, we ask Django for users with this email
-    // This uses Django's filtering (if enabled) or we find them in the list
-    const response = await axios.get(API_URL);
-    const users = response.data;
-    
-    const user = users.find((u: any) => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (user) {
-        localStorage.setItem('user', JSON.stringify(user));
-        return user;
-    } else {
-        throw new Error("Invalid email address. Please sign up first.");
+// 2. LOGIN: Verify email and password
+export const loginUser = async (email: string, password: string) => {
+    const response = await axios.post(`${API_URL}login/`, { email, password });
+    if (response.data) {
+        localStorage.setItem('user', JSON.stringify(response.data));
+        return response.data;
     }
+    throw new Error("Login failed");
 };
 
 // 3. GET CURRENT USER: Used by DashboardLayout to check permissions

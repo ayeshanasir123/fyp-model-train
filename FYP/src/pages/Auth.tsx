@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon, ShieldCheck, Heart, Award, Users } from 'lucide-react';
+import { Sun, Moon, ShieldCheck, Heart, Award, Users, AlertCircle } from 'lucide-react';
 import './Auth.css';
 import ParticleBackground from '../components/ui/ParticleBackground';
 import { signupUser, loginUser } from '../services/authService';
@@ -10,6 +10,8 @@ const Auth: React.FC = () => {
     const [theme, setTheme] = useState('dark');
     const [role, setRole] = useState<'client' | 'coach'>('client');
     const [isPending, setIsPending] = useState(false);
+    const [errors, setErrors] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     // Form States
     const [name, setName] = useState('');
@@ -24,49 +26,85 @@ const Auth: React.FC = () => {
         document.documentElement.setAttribute('data-theme', newTheme);
     };
 
+    const validateForm = (): boolean => {
+        const newErrors: string[] = [];
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            newErrors.push('Please enter a valid email address');
+        }
+
+        // Password validation
+        if (!password || password.length < 6) {
+            newErrors.push('Password must be at least 6 characters long');
+        }
+
+        // Name validation for signup
+        if (isSignUp && (!name || name.trim().length < 2)) {
+            newErrors.push('Name must be at least 2 characters long');
+        }
+
+        // Age validation for client signup
+        if (isSignUp && role === 'client') {
+            const ageNum = parseInt(age);
+            if (isNaN(ageNum) || ageNum < 13 || ageNum > 120) {
+                newErrors.push('Age must be between 13 and 120 years');
+            }
+        }
+
+        setErrors(newErrors);
+        return newErrors.length === 0;
+    };
+
     const handleAuthAction = async () => {
-        // Validation logic
-        if (!email || !password || (isSignUp && !name)) {
-            alert("Please fill in all required fields.");
+        if (!validateForm()) {
             return;
         }
+
+        setIsLoading(true);
+        setErrors([]);
 
         try {
             if (isSignUp) {
                 console.log("🚀 Starting Signup Process...");
                 
-                // 1. Create the BASE USER in Django
-                const userData = await signupUser(name, email, role);
+                // Create the user with password
+                const userData = await signupUser(name, email, password, role);
                 console.log("✅ User created successfully:", userData);
-
-                // Note: If you haven't set up apiService yet, 
-                // we just store the basic info and move on.
-                localStorage.setItem('userRole', role);
-                localStorage.setItem('userName', name);
-                localStorage.setItem('userEmail', email);
 
                 if (role === 'coach') {
                     setIsPending(true);
                 } else {
-                    window.location.href = '/dashboard';
+                    // Redirect to login page instead of dashboard
+                    alert('Account created successfully! Please log in.');
+                    setIsSignUp(false);
+                    setName('');
+                    setPassword('');
                 }
             } else {
-                // LOGIN FLOW
+                // LOGIN FLOW with password verification
                 console.log("🔑 Starting Login Process...");
-                const loggedInUser = await loginUser(email);
+                const loggedInUser = await loginUser(email, password);
                 console.log("✅ Logged in:", loggedInUser);
                 window.location.href = '/dashboard';
             }
         } catch (error: any) {
             console.error("❌ Auth Error Details:", error);
             
-            // Check if Django sent a specific error message (like "Email already exists")
-            if (error.response && error.response.data) {
-                const backendErrors = JSON.stringify(error.response.data);
-                alert(`Backend Error: ${backendErrors}`);
+            if (error.response?.status === 401) {
+                setErrors(['Invalid password. Please try again.']);
+            } else if (error.response?.status === 404) {
+                setErrors(['User not found. Please sign up first.']);
+            } else if (error.response?.data) {
+                const backendErrors = error.response.data;
+                const errorMessages = Object.values(backendErrors).flat().map(String);
+                setErrors(errorMessages);
             } else {
-                alert("Connection error. Ensure your Django server is running and CORS is enabled.");
+                setErrors(['Connection error. Please ensure the server is running.']);
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -95,36 +133,131 @@ const Auth: React.FC = () => {
                 {theme === 'light' ? <Moon size={24} /> : <Sun size={24} color="#FDB813" />}
             </div>
 
-            <div className="auth-container">
+            <div className={`auth-container ${isSignUp ? 'right-panel-active' : ''}`}>
                 {/* LOGIN PANEL (Left) */}
-                <div className="panel">
-                    <div className="auth-form">
-                        <h1>Welcome back</h1>
-                        <p>Sign in to your MindWell sanctuary.</p>
-                        <input className="input-field" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                        <input className="input-field" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                        <button className="main-btn" onClick={handleAuthAction}>SIGN IN</button>
+                <div className="form-container sign-in-container">
+                    <div className="panel">
+                        <div className="auth-form">
+                            <h1>Welcome back</h1>
+                            <p>Sign in to your MindWell sanctuary.</p>
+                            
+                            {/* Error Messages */}
+                            {!isSignUp && errors.length > 0 && (
+                                <div className="error-box">
+                                    {errors.map((error, index) => (
+                                        <div key={index} className="error-message">
+                                            <AlertCircle size={16} />
+                                            <span>{error}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            
+                            <input 
+                                className="input-field" 
+                                type="email" 
+                                placeholder="Email" 
+                                value={email} 
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={isLoading}
+                            />
+                            <input 
+                                className="input-field" 
+                                type="password" 
+                                placeholder="Password" 
+                                value={password} 
+                                onChange={(e) => setPassword(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleAuthAction()}
+                                disabled={isLoading}
+                            />
+                            <button 
+                                className="main-btn" 
+                                onClick={handleAuthAction}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? 'SIGNING IN...' : 'SIGN IN'}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {/* SIGNUP PANEL (Right) */}
-                <div className="panel">
-                    <div className="auth-form">
-                        <h1>Create safe space</h1>
+                <div className="form-container sign-up-container">
+                    <div className="panel">
+                        <div className="auth-form">
+                            <h1>Create safe space</h1>
+                        
+                        {/* Error Messages */}
+                        {isSignUp && errors.length > 0 && (
+                            <div className="error-box">
+                                {errors.map((error, index) => (
+                                    <div key={index} className="error-message">
+                                        <AlertCircle size={16} />
+                                        <span>{error}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
                         <div className="role-selector">
-                            <button className={role === 'client' ? 'active' : ''} onClick={() => setRole('client')}><Users size={16} /> Client</button>
-                            <button className={role === 'coach' ? 'active' : ''} onClick={() => setRole('coach')}><Award size={16} /> Coach</button>
+                            <button 
+                                className={role === 'client' ? 'active' : ''} 
+                                onClick={() => setRole('client')}
+                                disabled={isLoading}
+                            >
+                                <Users size={16} /> Client
+                            </button>
+                            <button 
+                                className={role === 'coach' ? 'active' : ''} 
+                                onClick={() => setRole('coach')}
+                                disabled={isLoading}
+                            >
+                                <Award size={16} /> Coach
+                            </button>
                         </div>
 
-                        <input className="input-field" type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
-                        <input className="input-field" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <input 
+                            className="input-field" 
+                            type="text" 
+                            placeholder="Full Name" 
+                            value={name} 
+                            onChange={(e) => setName(e.target.value)}
+                            disabled={isLoading}
+                        />
+                        <input 
+                            className="input-field" 
+                            type="email" 
+                            placeholder="Email" 
+                            value={email} 
+                            onChange={(e) => setEmail(e.target.value)}
+                            disabled={isLoading}
+                        />
                         
                         <AnimatePresence>
                             {role === 'client' && (
-                                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="extra-fields">
+                                <motion.div 
+                                    initial={{ height: 0, opacity: 0 }} 
+                                    animate={{ height: 'auto', opacity: 1 }} 
+                                    exit={{ height: 0, opacity: 0 }} 
+                                    className="extra-fields"
+                                >
                                     <div className="field-row">
-                                        <input className="input-field half" type="number" placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} />
-                                        <select className="input-field half" value={gender} onChange={(e) => setGender(e.target.value)}>
+                                        <input 
+                                            className="input-field half" 
+                                            type="number" 
+                                            placeholder="Age" 
+                                            min="13"
+                                            max="120"
+                                            value={age} 
+                                            onChange={(e) => setAge(e.target.value)}
+                                            disabled={isLoading}
+                                        />
+                                        <select 
+                                            className="input-field half" 
+                                            value={gender} 
+                                            onChange={(e) => setGender(e.target.value)}
+                                            disabled={isLoading}
+                                        >
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
                                             <option value="Non-binary">Non-binary</option>
@@ -134,39 +267,43 @@ const Auth: React.FC = () => {
                             )}
                         </AnimatePresence>
 
-                        <input className="input-field" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                        <button className="main-btn" onClick={handleAuthAction}>
-                            {role === 'coach' ? 'REQUEST VERIFICATION' : 'CREATE ACCOUNT'}
+                        <input 
+                            className="input-field" 
+                            type="password" 
+                            placeholder="Password (min 6 characters)" 
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleAuthAction()}
+                            disabled={isLoading}
+                        />
+                        <button 
+                            className="main-btn" 
+                            onClick={handleAuthAction}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'CREATING...' : (role === 'coach' ? 'REQUEST VERIFICATION' : 'CREATE ACCOUNT')}
                         </button>
                     </div>
                 </div>
+            </div>
 
                 {/* OVERLAY SECTION */}
-                <motion.div 
-                    className="overlay-container" 
-                    animate={{ x: isSignUp ? '-100%' : '0%' }} 
-                    transition={{ type: "spring", stiffness: 80, damping: 17 }}
-                >
+                <div className="overlay-container">
                     <div className="overlay">
-                        <AnimatePresence mode="wait">
-                            {isSignUp ? (
-                                <motion.div key="to-signin" className="overlay-content" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                                    <Heart size={50} />
-                                    <h2>Already a member?</h2>
-                                    <p>Login to continue your journey.</p>
-                                    <button className="ghost-btn" onClick={() => setIsSignUp(false)}>SIGN IN</button>
-                                </motion.div>
-                            ) : (
-                                <motion.div key="to-signup" className="overlay-content" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                                    <ShieldCheck size={50} />
-                                    <h2>New here?</h2>
-                                    <p>Begin your secure, AI-guided therapy experience today.</p>
-                                    <button className="ghost-btn" onClick={() => setIsSignUp(true)}>SIGN UP</button>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                        <div className="overlay-panel overlay-left">
+                            <Heart size={50} />
+                            <h2>Already a member?</h2>
+                            <p>Login to continue your journey.</p>
+                            <button className="ghost-btn" onClick={() => setIsSignUp(false)}>SIGN IN</button>
+                        </div>
+                        <div className="overlay-panel overlay-right">
+                            <ShieldCheck size={50} />
+                            <h2>New here?</h2>
+                            <p>Begin your secure, AI-guided therapy experience today.</p>
+                            <button className="ghost-btn" onClick={() => setIsSignUp(true)}>SIGN UP</button>
+                        </div>
                     </div>
-                </motion.div>
+                </div>
             </div>
         </div>
     );
